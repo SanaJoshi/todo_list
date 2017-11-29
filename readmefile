@@ -1,0 +1,159 @@
+mkdir myreact_todo_list
+cd myreact_todo_list
+yarn add webpack --dev
+yarn add babel-loader --dev
+ yarn add babel-preset-react-app --dev
+
+ ####create a .babelrc file
+
+
+{
+"presets": ["react-app"]
+}
+
+####create a index.html file
+
+index.html
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <title>Hello World</title>
+    </head>
+    <body>
+        <div id="app"></div>
+        <script src="app-bundle.js"></script>
+
+    </body>
+</html>
+
+####create a src folder and a index.js file in it.
+
+#####index.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+
+ReactDOM.render(
+  <App />, document.getElementById('app')
+);
+create a webpack.config.js file.
+
+const path = require('path');
+
+module.exports = {
+  entry: { app: './src/index.js'},
+  output: {
+    path: path.resolve(__dirname),
+    filename: '[name]-bundle.js'
+  },
+  module:{
+    rules: [
+      {
+        test: /\.js$/,
+        include: path.resolve(__dirname,'src'),
+        use: ['babel-loader']
+      }
+    ]
+  }
+};
+
+$ yarn run build
+
+
+package.json will be automatically created. copy and paste the text below.
+
+package.json
+{
+  "dependencies": {
+    "react": "^16.1.1",
+    "react-dom": "^16.1.1",
+    "serve": "^6.4.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-react-app": "^3.1.0",
+    "cross-env": "^5.1.1",
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.5"
+  },
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack -p",
+    "start": "cross-env NODE_ENV=development webpack-dev-server -d"
+  }
+}
+
+#####create a App.js file in src folder, copy and paste bellow
+
+App.js
+import React from 'react';
+import TodoItem from './TodoItem'
+
+const toggleItemAtIndex = (items,indexToToggle)=>{
+  const item = items [indexToToggle];
+  item.completed = !item.completed;
+  return items;
+}
+class App extends React.Component{
+  constructor(){
+    super()
+    this.state = {items: [
+      {description: 'First',completed: true},
+      {description: 'Second',completed: false},
+      {description: 'Third',completed: true},
+      {description: 'Fourth',completed: false},
+      {description: 'Fifth',completed: false}
+    ]}
+  }
+
+  onToggleItemAtIndex = (index) => {
+    this.setState((prevState)=>{
+      let items = prevState.items;
+      items = toggleItemAtIndex(items,index);
+      return { items }
+    })
+  }
+
+  render(){
+    const items = this.state.items;
+
+    return(
+      <div className="App">
+      {
+        items.map((item,index)=>(
+          <TodoItem key={index}
+          description={item.description}
+          completed={item.completed}
+          onToggle={()=>this.onToggleItemAtIndex(index)}
+          />
+        ))
+      }
+      </div>
+    )
+  }
+}
+
+export default App
+
+#####create a TodoItem.js file in src folder, copy and paste below.
+
+
+import React from 'react';
+
+const TodoItem = ({description, completed, onToggle})=> (
+  <label>
+  <input type="checkbox" checked={completed} onChange={ onToggle }/>
+  {description}
+  </label>
+)
+
+export default TodoItem
+#####yarn add cross-env --dev
+#####yarn install
+#####yarn run build
+
+Then run the server
+
+$ yarn run start
